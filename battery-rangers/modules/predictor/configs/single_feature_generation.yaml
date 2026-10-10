@@ -1,0 +1,48 @@
+remove_threshold: 0.90
+feature_generation:
+  - types: ['descriptor']
+    params:
+      descriptor: {}
+  - types: ['custom_pattern']
+    params:
+      custom_pattern:
+        count: True
+  - types: ['descriptor', 'custom_pattern']
+    params:
+      descriptor: {}
+      custom_pattern:
+        count: True
+  - types: ['one_hot_selfies']
+    params:
+      one_hot_selfies: {}
+  - types: ["ecfp"]
+    params:
+      ecfp:
+        radius: 2
+        size: 1024
+        count: True
+  - types: ["maccs"]
+    params:
+      maccs:
+        count: True
+  - types: ["functional_groups"]
+    params:
+      functional_groups:
+        count: True
+  - types: ["atom_pair"]
+    params:
+      atom_pair:
+        count: True
+        size: 1024
+  - types: ["estate"]
+    params:
+      estate:
+        variant: 'sum'
+  - types: ["physiochemical"]
+    params:
+      physiochemical:
+        count: True
+        size: 1024
+  - types: ["bcut"]
+    params:
+      bcut: {}

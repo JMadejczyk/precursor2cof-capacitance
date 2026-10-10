@@ -1,0 +1,51 @@
+save_dir: '../../../results/cof_matched_rth_0.99_smape_pa/greedy_forward_selection_per_model/'
+datasets_dir: '../../../data/predictor/cof_matched/rth_0.99/'
+
+dataset_params:
+  num_folds: 10
+  num_bins: 10
+  num_bins_hyperparam_opt: 10
+
+# Candidate feature sets to combine greedily (names from datasets_dir/features, with or without .csv)
+feature_sets:
+  - 'features_rth_0.99_descriptor_False_False'
+  - 'features_rth_0.99_estate_sum'
+  - 'features_rth_0.99_ecfp_2_1024_True'
+  - 'features_rth_0.99_custom_pattern_True'
+  - 'features_rth_0.99_functional_groups_True'
+  - 'features_rth_0.99_maccs_True'
+
+# Models to evaluate per candidate set. Include 'chemprop' only if chemprop_model_path is set.
+models:
+  - 'knn'
+  - 'xgboost'
+  - 'random_forest'
+  - 'lasso'
+  - 'bayes'
+  - 'mlp'
+  - 'tabpfn'
+
+# per_model: independent best ordering per model
+# global: one shared ordering based on mean combined rank across models
+selection_mode: 'per_model'
+
+# Ranking is computed from these two metrics
+ranking_metrics:
+  smape: 'smape'
+  pa: 'pairwise_accuracy_score'
+
+# Metrics passed to training pipelines (must contain ranking metrics above)
+metrics:
+  - 'pairwise_accuracy_score'
+  - 'smape'
+  - 'rmse'
+  - 'mae'
+  - 'r2_score'
+
+hyperparam_opt: True
+verbose: True
+
+# Optional: required only when 'chemprop' is in models
+chemprop_params:
+  chemprop_model_path: '../training_and_evaluation/foundation_models/chemeleon_mp.pt'
+  chemprop_dataset_path: '../../../data/predictor/cof_matched/data_substrate_cofs.csv'

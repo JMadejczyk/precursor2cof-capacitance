@@ -1,0 +1,29 @@
+remove_threshold: 0.99
+feature_generation:
+  - types: ['descriptor']
+    params:
+      descriptor:
+        flatness: False
+        symmetry: False
+  - types: ["ecfp"]
+    params:
+      ecfp:
+        radius: 2
+        size: 1024
+        count: True
+  - types: ["estate"]
+    params:
+      estate:
+        variant: 'sum'
+  - types: ['custom_pattern']
+    params:
+      custom_pattern:
+        count: True
+  - types: ['maccs']
+    params:
+      maccs:
+        count: True
+  - types: ['functional_groups']
+    params:
+      functional_groups:
+        count: True

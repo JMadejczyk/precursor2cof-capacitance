@@ -1,0 +1,8 @@
+[submodule "modules/REINVENT4"]
+	path = modules/REINVENT4
+	url = https://github.com/wtaisner/REINVENT4.git
+	branch = main
+[submodule "modules/Mol-AIR"]
+	path = modules/mol_air
+	url = git@github.com:wtaisner/Mol-AIR.git
+	branch = main

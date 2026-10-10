@@ -1,0 +1,103 @@
+remove_threshold: 0.99
+feature_generation:
+  - types: ['descriptor']
+    params:
+      descriptor:
+        flatness: False
+  - types: [ "ecfp", "descriptor"]
+    params:
+      ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      descriptor:
+        flatness: False
+  - types: [ "ecfp", "descriptor", "custom_pattern" ]
+    params:
+      ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      descriptor:
+        flatness: False
+      custom_pattern:
+            count: True
+  - types: [ "ecfp", "estate", "descriptor" ]
+    params:
+      ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      estate:
+        variant: 'sum'
+      descriptor:
+        flatness: False
+  - types: ["ecfp", "physiochemical", "descriptor"]
+    params:
+      ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      physiochemical:
+        count: True
+        size: 1024
+      descriptor:
+        flatness: False
+
+
+
+  - types: ['descriptor']
+    params:
+      descriptor:
+        flatness: True
+  - types: [ "ecfp", "descriptor"]
+    params:
+      ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      descriptor:
+        flatness: True
+  - types: [ "ecfp", "descriptor", "custom_pattern" ]
+    params:
+      ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      descriptor:
+        flatness: True
+      custom_pattern:
+            count: True
+  - types: [ "ecfp", "estate", "descriptor" ]
+    params:
+      ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      estate:
+        variant: 'sum'
+      descriptor:
+        flatness: True
+  - types: ["ecfp", "physiochemical", "descriptor"]
+    params:
+      ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      physiochemical:
+        count: True
+        size: 1024
+      descriptor:
+        flatness: True
+  - types: [ "ecfp", "estate", "descriptor", "custom_pattern" ]
+    params:
+      ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      estate:
+        variant: 'sum'
+      descriptor:
+        flatness: False
+      custom_pattern:
+        count: True

@@ -1,0 +1,29 @@
+save_dir: '../../../results/cof_matched_rth_0.99_smape_pa/'
+datasets_dir: '../../../data/predictor/cof_matched/rth_0.99/'
+dataset_params:
+  num_folds: 10
+  num_bins: 10
+  num_bins_hyperparam_opt: 10
+models: [
+  'knn',
+  'xgboost',
+  'random_forest',
+  'lasso',
+  'bayes',
+  'mlp',
+  #'tabpfn',
+  #'chemprop'
+]
+chemprop_params:
+  chemprop_model_path: '../training_and_evaluation/foundation_models/chemeleon_mp.pt'
+  chemprop_dataset_path: '../../../data/predictor/cof_matched/data_substrate_cofs.csv'
+metrics: [
+  'pairwise_accuracy_score',
+  'ndcg_score',
+  'rmse',
+  'mae',
+  'mape',
+  'smape',
+  'r2_score'
+]
+hyperparam_opt: True

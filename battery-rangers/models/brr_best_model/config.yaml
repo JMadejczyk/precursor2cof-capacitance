@@ -1,0 +1,15 @@
+model: 'brr_best_model/model_final.joblib'
+scaler: 'brr_best_model/model_scaler_final.joblib'
+numerical_features: 'brr_best_model/features_to_keep.csv'
+explain: 'coefficient'
+train_data: 'brr_best_model/data.csv'
+dataset:
+  ecfp:
+    size: 1024
+    radius: 2
+    count: True
+  functional_groups:
+    count: True
+  estate:
+    variant: sum
+  features_to_keep: 'brr_best_model/features_to_keep.csv'

@@ -1,0 +1,14 @@
+model: 'rf_best_model/model_final.joblib'
+scaler: 'rf_best_model/model_scaler_final.joblib'
+numerical_features: 'rf_best_model/features_to_keep.csv'
+explain: 'shap'
+dataset:
+  ecfp:
+    size: 1024
+    radius: 2
+    count: True
+  functional_groups:
+    count: True
+  estate:
+    variant: sum
+  features_to_keep: 'rf_best_model/features_to_keep.csv'
