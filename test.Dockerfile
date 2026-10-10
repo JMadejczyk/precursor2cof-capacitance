@@ -4,7 +4,7 @@ FROM ghcr.io/astral-sh/uv:debian
 # Set the working directory
 WORKDIR /app
 
-# Set the PYTHONPATH so Python can find your modules
+# Set the PYTHONPATH so Python can find your modules and scripts
 ENV PYTHONPATH=/app
 
 ## Force scientific libraries to run single-threaded. This prevents race
@@ -13,9 +13,15 @@ ENV OMP_NUM_THREADS=1
 ENV MKL_NUM_THREADS=1
 ENV OPENBLAS_NUM_THREADS=1
 
+# Install dependencies first for layer caching
 COPY pyproject.toml .
+# COPY uv.lock . # uncomment if you track uv.lock
 RUN uv sync --all-extras --dev
 
-COPY precursor2cof-capacitance .
+# Copy configuration and source directories
+COPY .pylintrc .
+COPY modules/ ./modules/
+COPY scripts/ ./scripts/
 
-RUN uv run pylint modules --rcfile=.pylintrc
+# Run pylint on both modules and scripts
+RUN uv run pylint modules scripts --rcfile=.pylintrc
