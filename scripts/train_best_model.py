@@ -4,10 +4,10 @@ import os
 
 import pandas as pd
 
-from modules.predictor.data.utils import custom_data_kfold
-from modules.predictor.scripts.greedy_forward_selection import _build_combined_dataset, _load_feature_sets
-from modules.predictor.training_and_evaluation.sklearn_pipeline import SklearnTrainingPipeline
-from modules.predictor.training_and_evaluation.tabpfn_pipeline import TabPFNTrainingPipeline
+from modules.data.utils import custom_data_kfold
+from scripts.greedy_forward_selection import _build_combined_dataset, _load_feature_sets
+from modules.training_and_evaluation.sklearn_pipeline import SklearnTrainingPipeline
+from modules.training_and_evaluation.tabpfn_pipeline import TabPFNTrainingPipeline
 
 if __name__ == "__main__":
     datasets_dir = "../../../data/predictor/cof_matched/rth_0.99"

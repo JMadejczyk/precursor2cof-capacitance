@@ -4,8 +4,8 @@ import pandas as pd
 from mlxtend.feature_selection import SequentialFeatureSelector
 from sklearn.metrics import make_scorer
 
-from modules.predictor.data.utils import custom_data_split
-from modules.predictor.training_and_evaluation.evaluation_metrics import smape
+from modules.data.utils import custom_data_split
+from modules.training_and_evaluation.evaluation_metrics import smape
 
 # pylint: disable=invalid-name
 

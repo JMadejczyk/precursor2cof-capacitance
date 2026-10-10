@@ -11,7 +11,7 @@ from skfp.fingerprints import (
     PhysiochemicalPropertiesFingerprint,
 )
 
-from modules.predictor.features.feature_factory import FeatureFactory
+from modules.features.feature_factory import FeatureFactory
 
 
 # connectivity

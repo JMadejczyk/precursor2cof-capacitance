@@ -13,10 +13,9 @@ from sklearn.metrics import root_mean_squared_error
 from sklearn.preprocessing import MaxAbsScaler, OneHotEncoder, StandardScaler
 from tabpfn_extensions.interpretability import shapiq
 
-from modules.predictor.data.utils import custom_data_split
-from modules.predictor.training_and_evaluation.evaluation_metrics import EvalMetrics
-from modules.predictor.training_and_evaluation.model_factory import Models
-from modules.predictor.training_and_evaluation.training_pipeline import ModelTrainingPipeline
+from modules.data.utils import custom_data_split
+from modules.training_and_evaluation.model_factory import Models
+from modules.training_and_evaluation.training_pipeline import ModelTrainingPipeline
 
 optuna.logging.set_verbosity(optuna.logging.ERROR)
 warnings.filterwarnings("ignore")

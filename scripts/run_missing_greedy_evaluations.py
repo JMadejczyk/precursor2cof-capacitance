@@ -10,7 +10,7 @@ from typing import Any
 
 import yaml
 
-from modules.predictor.scripts.greedy_forward_selection import _evaluate_candidate, _load_feature_sets
+from scripts.greedy_forward_selection import _evaluate_candidate, _load_feature_sets
 
 
 def _parse_args() -> argparse.Namespace:

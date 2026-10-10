@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.preprocessing import MinMaxScaler
 
-from modules.predictor.features.utils import fingerprint_feature_types
+from modules.features.utils import fingerprint_feature_types
 
 
 class FeatureFactory:

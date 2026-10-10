@@ -10,8 +10,8 @@ from chemprop import data, featurizers, models, nn
 from lightning import pytorch as pl
 from lightning.pytorch.callbacks import ModelCheckpoint
 
-from modules.predictor.data.utils import custom_data_split
-from modules.predictor.training_and_evaluation.training_pipeline import ModelTrainingPipeline
+from modules.data.utils import custom_data_split
+from modules.training_and_evaluation.training_pipeline import ModelTrainingPipeline
 
 seed = 42
 torch.manual_seed(seed)

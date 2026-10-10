@@ -12,10 +12,10 @@ from typing import Any
 import pandas as pd
 import yaml
 
-from modules.predictor.data.utils import custom_data_kfold
-from modules.predictor.training_and_evaluation.chemprop_pipeline import ChempropTrainingPipeline
-from modules.predictor.training_and_evaluation.sklearn_pipeline import SklearnTrainingPipeline
-from modules.predictor.training_and_evaluation.tabpfn_pipeline import TabPFNTrainingPipeline
+from modules.data.utils import custom_data_kfold
+from modules.training_and_evaluation.chemprop_pipeline import ChempropTrainingPipeline
+from modules.training_and_evaluation.sklearn_pipeline import SklearnTrainingPipeline
+from modules.training_and_evaluation.tabpfn_pipeline import TabPFNTrainingPipeline
 
 # pylint: disable=import-error
 

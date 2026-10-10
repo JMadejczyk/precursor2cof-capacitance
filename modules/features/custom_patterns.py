@@ -2,7 +2,7 @@
 import numpy as np
 from rdkit import Chem
 
-from modules.predictor.features.feature_factory import FeatureFactory
+from modules.features.feature_factory import FeatureFactory
 
 
 @FeatureFactory.register("custom_pattern")

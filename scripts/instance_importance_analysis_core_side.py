@@ -766,7 +766,7 @@ def main(smiles_list_all: List[str], output_dir: str = "outputs_brr", config_pat
 
 
 if __name__ == "__main__":
-    smiles = pd.read_csv("../notebooks/lab_smiles.csv")["smiles"].tolist()
+    smiles = pd.read_csv("../../../notebooks/lab_smiles.csv")["smiles"].tolist()
     print(len(smiles))
-    config_file = "../notebooks/rf_best_model/config.yaml"
-    main(smiles, output_dir="../notebooks/new_outputs_rf", config_path=config_file)
+    config_file = "../../../notebooks/rf_best_model/config.yaml"
+    main(smiles, output_dir="../../../notebooks/new_outputs_rf", config_path=config_file)

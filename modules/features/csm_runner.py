@@ -24,7 +24,7 @@ from docker.models.containers import Container
 from rdkit import Chem
 from rdkit.Chem import Mol
 
-from modules.predictor.features.utils import compute_conformer
+from modules.features.utils import compute_conformer
 
 
 @dataclass

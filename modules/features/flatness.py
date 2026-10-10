@@ -7,7 +7,7 @@ from rdkit import Chem
 from rdkit.Chem import Mol
 from sklearn.linear_model import LinearRegression
 
-from modules.predictor.features.utils import compute_conformer
+from modules.features.utils import compute_conformer
 
 
 def get_flatness_mol(molecule: Mol | str, plot_visualization: bool = False, **kwargs) -> float | None:

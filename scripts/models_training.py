@@ -6,10 +6,10 @@ import os
 import pandas as pd
 import yaml
 
-from modules.predictor.data.utils import cft_cof_filter, custom_data_kfold, custom_data_kfold_ctf_cof
-from modules.predictor.training_and_evaluation.chemprop_pipeline import ChempropTrainingPipeline
-from modules.predictor.training_and_evaluation.sklearn_pipeline import SklearnTrainingPipeline
-from modules.predictor.training_and_evaluation.tabpfn_pipeline import TabPFNTrainingPipeline
+from modules.data.utils import custom_data_kfold
+from modules.training_and_evaluation.chemprop_pipeline import ChempropTrainingPipeline
+from modules.training_and_evaluation.sklearn_pipeline import SklearnTrainingPipeline
+from modules.training_and_evaluation.tabpfn_pipeline import TabPFNTrainingPipeline
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--config_path", type=str, required=True, help="Path to the configuration yaml file")
@@ -56,10 +56,9 @@ if __name__ == "__main__":
             datasets_chemprop["smiles"] = (smiles_dataset, "")
             for d_name in datasets_chemprop:
                 dataset, feature_types = datasets_chemprop[d_name]
-                cof_types = cft_cof_filter(dataset["smiles"])
                 X = dataset.drop(columns=["capacity_max"])
                 y = dataset[["capacity_max"]]
-                folds = custom_data_kfold_ctf_cof(X, y, cof_types, num_splits=num_folds, num_bins=num_bins, random_state=42)
+                folds = custom_data_kfold(X, y, num_splits=num_folds, num_bins=num_bins, random_state=42)
 
                 save_dir = os.path.join(results_dir, model, d_name)
                 print(model, save_dir)
@@ -92,10 +91,9 @@ if __name__ == "__main__":
         else:
             for d_name in datasets:
                 dataset, feature_types = datasets[d_name]
-                cof_types = cft_cof_filter(dataset["smiles"])
                 X = dataset.drop(columns=["capacity_max", "smiles"])
                 y = dataset[["capacity_max"]]
-                folds = custom_data_kfold_ctf_cof(X, y, cof_types, num_splits=num_folds, num_bins=num_bins, random_state=42)
+                folds = custom_data_kfold(X, y, num_splits=num_folds, num_bins=num_bins, random_state=42)
 
                 save_dir = os.path.join(results_dir, model, d_name)
                 print(d_name, model, save_dir)

@@ -16,6 +16,6 @@ ENV OPENBLAS_NUM_THREADS=1
 COPY pyproject.toml .
 RUN uv sync --all-extras --dev
 
-COPY . .
+COPY battery-rangers .
 
 RUN uv run pylint modules --rcfile=.pylintrc

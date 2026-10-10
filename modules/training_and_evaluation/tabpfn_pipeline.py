@@ -11,7 +11,7 @@ from tabpfn import load_fitted_tabpfn_model, save_fitted_tabpfn_model
 from tabpfn_extensions import TunedTabPFNRegressor, interpretability
 from tabpfn_extensions.hpo import TabPFNSearchSpace
 
-from modules.predictor.training_and_evaluation.training_pipeline import ModelTrainingPipeline
+from modules.training_and_evaluation.training_pipeline import ModelTrainingPipeline
 
 seed = 42
 torch.manual_seed(seed)

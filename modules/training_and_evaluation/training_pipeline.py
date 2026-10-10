@@ -9,7 +9,7 @@ import numpy as np
 import optuna
 import pandas as pd
 
-from modules.predictor.training_and_evaluation.evaluation_metrics import EvalMetrics
+from modules.training_and_evaluation.evaluation_metrics import EvalMetrics
 
 optuna.logging.set_verbosity(optuna.logging.ERROR)
 warnings.filterwarnings("ignore")

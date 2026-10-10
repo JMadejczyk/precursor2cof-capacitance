@@ -9,7 +9,7 @@ from rdkit import Chem
 from rdkit.Chem import rdDepictor, rdMolDescriptors, rdmolops
 from tqdm import tqdm
 
-from modules.predictor.features.feature_factory import FeatureFactory
+from modules.features.feature_factory import FeatureFactory
 
 
 @FeatureFactory.register("descriptor")
