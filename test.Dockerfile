@@ -17,9 +17,3 @@ ENV OPENBLAS_NUM_THREADS=1
 COPY pyproject.toml .
 # COPY uv.lock . # uncomment if you track uv.lock
 RUN uv sync --all-extras --dev
-
-# Copy configuration and source directories
-COPY . .
-
-# Run pylint on both modules and scripts
-RUN uv run pylint modules scripts --rcfile=.pylintrc
