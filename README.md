@@ -15,5 +15,3 @@ Assuming you have `uv` installed, you can run `uv sync --all-extras --build` to 
 Install pre-commit hooks: `pre-commit install`. From now on, it will run check automatically on `git commit`.
 
 You can also run it manually with `pre-commit run --all-files`.
-
-

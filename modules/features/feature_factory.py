@@ -1,4 +1,5 @@
 """Functions for generating features."""
+
 from typing import Callable
 
 import numpy as np
@@ -85,7 +86,7 @@ def generate_features(df: pd.DataFrame, pre_dfs: dict, smiles_col: str, target_c
         feature_list_parts = []
         features_names_pre = []
         feature_types_combo = {}
-        for f_type, (pre_df, f_types) in pre_dfs.items():
+        for _, (pre_df, f_types) in pre_dfs.items():
             feature_array = pre_df.drop(columns=[smiles_col, target_col]).to_numpy()
             feature_list_parts.append(feature_array)
             features_names_pre.extend(pre_df.drop(columns=[smiles_col, target_col]).columns.tolist())

@@ -1,4 +1,5 @@
 """Custom pattern descriptors module."""
+
 import numpy as np
 from rdkit import Chem
 

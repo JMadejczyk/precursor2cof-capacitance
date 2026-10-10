@@ -210,7 +210,7 @@ class CSMRunner:
                 container_output_path,
                 "--keep-structure",
             ]
-            exit_code, (stdout, stderr) = container.exec_run(command, demux=True)
+            exit_code, (_, stderr) = container.exec_run(command, demux=True)
 
             if exit_code != 0:
                 analysis.error_messages[pg] = stderr.decode("utf-8") if stderr else "Execution failed with no stderr."

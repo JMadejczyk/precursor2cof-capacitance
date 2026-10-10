@@ -61,3 +61,22 @@ explicit = true
 [tool.ty.rules]
 unresolved-import = "ignore"
 unresolved-attribute = "ignore"
+
+[tool.ruff]
+line-length = 200
+target-version = "py312"
+exclude = [
+    ".ipynb_checkpoints",
+    "*.ipynb",
+]
+
+[tool.ruff.lint]
+# E, W: Pyflakes / Pycodestyle errors & warnings
+# F: Pyflakes
+# I: isort (import sorting)
+select = ["E", "F", "W", "I"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

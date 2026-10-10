@@ -1,15 +1,9 @@
 """Module for generating various molecular fingerprints using skfp."""
+
 from typing import Literal
 
 import skfp
-from skfp.fingerprints import (
-    BCUT2DFingerprint,
-    ECFPFingerprint,
-    EStateFingerprint,
-    FunctionalGroupsFingerprint,
-    MACCSFingerprint,
-    PhysiochemicalPropertiesFingerprint,
-)
+from skfp.fingerprints import BCUT2DFingerprint, ECFPFingerprint, EStateFingerprint, FunctionalGroupsFingerprint, MACCSFingerprint, PhysiochemicalPropertiesFingerprint
 
 from modules.features.feature_factory import FeatureFactory
 

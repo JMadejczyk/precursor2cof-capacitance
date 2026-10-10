@@ -1,4 +1,5 @@
 """Cross-validation training pipeline."""
+
 import os
 import warnings
 from abc import ABC, abstractmethod
@@ -134,7 +135,7 @@ class ModelTrainingPipeline(ABC):
         """
         results_save_dir = self.save_dir
         os.makedirs(results_save_dir, exist_ok=True)
-        results_path = os.path.join(results_save_dir, f"aggregated_results.txt")
+        results_path = os.path.join(results_save_dir, "aggregated_results.txt")
         with open(results_path, "w") as f:
             f.write(f"Model: {model_name}\n")
             f.write(f"Parameters: {model_params}\n")
@@ -143,13 +144,13 @@ class ModelTrainingPipeline(ABC):
         if self.verbose:
             print(f"Results saved to {results_path}")
         # save partial scores
-        partial_scores_path = os.path.join(results_save_dir, f"scores.pickle")
+        partial_scores_path = os.path.join(results_save_dir, "scores.pickle")
         with open(partial_scores_path, "wb") as f:
             joblib.dump(self.scores, f)
         if self.verbose:
             print(f"Partial scores saved to {partial_scores_path}")
         # save feature importance
-        f_importance_path = os.path.join(results_save_dir, f"feature_importance.pickle")
+        f_importance_path = os.path.join(results_save_dir, "feature_importance.pickle")
         with open(f_importance_path, "wb") as f:
             joblib.dump(self.feature_importance, f)
         if self.verbose:

@@ -1,4 +1,5 @@
 """Script for training machine learning models for the predictor module."""
+
 import argparse
 import copy
 import os
@@ -81,7 +82,7 @@ if __name__ == "__main__":
                 results, scores, f_importance, model_params = pipeline.train_pipeline(model_name=model)
                 print(f"Results for dataset smiles with model {model}:")
                 print(results)
-                print(f"Scores:")
+                print("Scores:")
                 print(scores)
                 print("Model hyperparameters:")
                 print(model_params)
@@ -130,7 +131,7 @@ if __name__ == "__main__":
                     results, scores, f_importance, model_params = pipeline.train_pipeline(model_name=model)
                     print(f"Results for dataset {d_name} with model {model}:")
                     print(results)
-                    print(f"Scores:")
+                    print("Scores:")
                     print(scores)
                     print("Model hyperparameters:")
                     print(model_params)

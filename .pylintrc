@@ -443,6 +443,7 @@ disable=raw-checker-failed,
         c-extension-no-member, #
         no-member,
         no-name-in-module,
+        invalid-name
 
 
 # Enable the message, report, category or checker with the given id(s). You can

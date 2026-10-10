@@ -17,14 +17,13 @@ touches side-group atoms, it is classified into the "other" partition.
 The code relies on RDKit and SHAP being available in the environment.
 """
 
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 import numpy as np
 import pandas as pd
 import shap
 from rdkit import Chem
-from rdkit.Chem import AllChem, rdDepictor, rdFMCS
-from rdkit.Chem.Draw import rdMolDraw2D
+from rdkit.Chem import rdFMCS
 
 
 def compute_mcs_smarts(smiles_list: List[str], timeout: int = 10) -> Tuple[str, Dict[int, Tuple[int, ...]]]:
@@ -129,18 +128,16 @@ def _instance_atoms_for_bit(mol: Chem.Mol, center_atom: int, radius: int) -> Set
     return atoms
 
 
-def partition_ecfp_bits_for_molecule(smiles: str, core_atom_idxs: Set[int], radius: int = 2, n_bits: int = 2048, use_chiral: bool = True, strict: bool = True) -> Dict[str, object]:
+def partition_ecfp_bits_for_molecule(smiles: str, core_atom_idxs: Set[int], radius: int = 2, n_bits: int = 2048, use_chiral: bool = True) -> Dict[str, object]:
     """Partition ECFP bit indices for a single molecule into core-only and other.
 
     Parameters
     ----------
     smiles: SMILES string
     core_atom_idxs: set of atom indices (0-based) that belong to the core
-    strict: if True (default), a bit is considered core-only only if ALL
-            instances (atom environments) that set that bit are entirely
-            contained in the core. If False, a bit is considered core if at
-            least one instance is fully in the core (but any instance reaching
-            outside will still mark collision -> 'other').
+    radius: radius of the Morgan fingerprint
+    n_bits: number of bits in the Morgan fingerprint
+    use_chiral: whether to use chiral information
 
     Returns a dict with keys: 'core_bits' (set), 'other_bits' (set), 'bit_info' (rdkit bitInfo)
     """
@@ -149,7 +146,6 @@ def partition_ecfp_bits_for_molecule(smiles: str, core_atom_idxs: Set[int], radi
         raise ValueError(f"Invalid SMILES: {smiles}")
 
     bit_info = {}
-    fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=n_bits, bitInfo=bit_info, useChirality=use_chiral)
 
     core_bits = {}
     other_bits = {}
@@ -189,7 +185,7 @@ def partition_ecfp_bits_for_molecule(smiles: str, core_atom_idxs: Set[int], radi
     return {"core_bits": core_bits, "other_bits": other_bits, "bit_info": bit_info}
 
 
-def aggregate_shap_with_core(shap_expl: shap.Explanation, features_df: pd.DataFrame, core_bits: dict, other_bits: dict, n_bits: int = 2048, sample_index: int = 0):
+def aggregate_shap_with_core(shap_expl: shap.Explanation, features_df: pd.DataFrame, core_bits: dict, other_bits: dict, sample_index: int = 0):
     """Aggregate SHAP values: sum core-bit SHAPs into a single 'core' feature
     and return a SHAP Explanation and Matplotlib figure showing the bar plot.
 
@@ -212,9 +208,6 @@ def aggregate_shap_with_core(shap_expl: shap.Explanation, features_df: pd.DataFr
     # map features_df columns to indices
     feat_cols = list(features_df.columns)
     col_to_idx = {c: i for i, c in enumerate(feat_cols)}
-
-    # find ecfp columns present
-    ecfp_cols_present = [c for c in feat_cols if c.startswith("ecfp_")]
 
     # compute core importance by summing SHAP values for core ecfp cols that exist
     core_importance = 0

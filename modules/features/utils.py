@@ -1,4 +1,5 @@
 """Utility functions for the features."""
+
 import logging
 
 import networkx as nx
@@ -186,33 +187,32 @@ def fingerprint_feature_types(name: str, feature_names: list[str], **kwargs) -> 
         if count:
             return {"categorical": [], "binary": [], "numerical": feature_names}
         return {"categorical": [], "binary": feature_names, "numerical": []}
-    elif name == "maccs":
+    if name == "maccs":
         count = kwargs.get("count", False)
         if count:
             return {"categorical": [], "binary": [], "numerical": feature_names}
         return {"categorical": [], "binary": feature_names, "numerical": []}
-    elif name == "functional_groups":
+    if name == "functional_groups":
         count = kwargs.get("count", False)
         if count:
             return {"categorical": [], "binary": [], "numerical": feature_names}
         return {"categorical": [], "binary": feature_names, "numerical": []}
-    elif name == "atom_pair":
+    if name == "atom_pair":
         count = kwargs.get("count", False)
         if count:
             return {"categorical": [], "binary": [], "numerical": feature_names}
         return {"categorical": [], "binary": feature_names, "numerical": []}
-    elif name == "estate":
+    if name == "estate":
         variant = kwargs.get("variant", "sum")
         if variant == "bit":
             return {"categorical": [], "binary": feature_names, "numerical": []}
         else:
             return {"categorical": [], "binary": [], "numerical": feature_names}
-    elif name == "physiochemical":
+    if name == "physiochemical":
         count = kwargs.get("count", False)
         if count:
             return {"categorical": [], "binary": [], "numerical": feature_names}
         return {"categorical": [], "binary": feature_names, "numerical": []}
-    elif name == "bcut":
+    if name == "bcut":
         return {"categorical": [], "binary": [], "numerical": feature_names}
-    else:
-        raise ValueError(f"Fingerprint feature types for '{name}' is not defined.")
+    raise ValueError(f"Fingerprint feature types for '{name}' is not defined.")

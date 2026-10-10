@@ -1,4 +1,5 @@
 """Sklearn training pipeline module."""
+
 import ast
 import copy
 import os
@@ -10,8 +11,7 @@ import optuna
 import pandas as pd
 import shap
 from sklearn.metrics import root_mean_squared_error
-from sklearn.preprocessing import MaxAbsScaler, OneHotEncoder, StandardScaler
-from tabpfn_extensions.interpretability import shapiq
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from modules.data.utils import custom_data_split
 from modules.training_and_evaluation.model_factory import Models
@@ -103,7 +103,7 @@ class SklearnTrainingPipeline(ModelTrainingPipeline):
                 model.set_params(**params)
 
                 scores = []
-                for i, fold in enumerate(folds):
+                for _, fold in enumerate(folds):
                     try:
                         train_idx, test_idx = fold
 
@@ -272,7 +272,7 @@ class SklearnTrainingPipeline(ModelTrainingPipeline):
         if len(self.save_dir) > 0:
             self.save_model(standard_scaler, fold_num="scaler_final")
             self.save_model(model, fold_num="final")
-            f_importance_path = os.path.join(self.save_dir, f"feature_importance.pickle")
+            f_importance_path = os.path.join(self.save_dir, "feature_importance.pickle")
             with open(f_importance_path, "wb") as f:
                 joblib.dump(f_imp, f)
             X_prepared.to_csv(os.path.join(self.save_dir, "data.csv"), index=False)

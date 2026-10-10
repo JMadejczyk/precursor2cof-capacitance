@@ -1,4 +1,5 @@
 """Flatness feature calculation."""
+
 import logging
 
 import matplotlib.pyplot as plt
@@ -99,9 +100,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Example usage
-    smiles = "Nc1ccc(-c2nc(-c3ccc(N)cc3)nc(-c3ccc(N4C(=O)c5ccc6c7c(ccc(c57)C4=O)C(=O)OC6=O)cc3)n2)cc1"
+    SMILES = "Nc1ccc(-c2nc(-c3ccc(N)cc3)nc(-c3ccc(N4C(=O)c5ccc6c7c(ccc(c57)C4=O)C(=O)OC6=O)cc3)n2)cc1"
 
-    f = get_flatness_mol(smiles, True, max_attempts=1, num_conformers=20)
+    f = get_flatness_mol(SMILES, True, max_attempts=1, num_conformers=20)
     logging.info(f"Flatness: {f}")
 
-    mol = Chem.MolFromSmiles(smiles)
+    mol = Chem.MolFromSmiles(SMILES)

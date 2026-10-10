@@ -1,11 +1,12 @@
 """Script to generate molecular features based on specified configurations."""
+
 import argparse
 import os
 
 import pandas as pd
 import yaml
 
-from modules.features.feature_factory import *
+from modules.features.feature_factory import *  # noqa: F403
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data_path", type=str, required=True, help="Path to the input data file - raw dataset")
@@ -52,7 +53,7 @@ if __name__ == "__main__":
             print("-" * 50)
             continue
 
-        df_features, dict_feature_types = generate_features(df, df_created, smiles_col="smiles", target_col="capacity_max", feature_types=f_types, remove_threshold=rth, kwargs=f_params)
+        df_features, dict_feature_types = generate_features(df, df_created, smiles_col="smiles", target_col="capacity_max", feature_types=f_types, remove_threshold=rth, kwargs=f_params)  # noqa: F405
 
         os.makedirs(os.path.dirname(output_path_csv), exist_ok=True)
         os.makedirs(os.path.dirname(output_path_ftypes), exist_ok=True)

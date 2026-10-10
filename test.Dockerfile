@@ -19,9 +19,7 @@ COPY pyproject.toml .
 RUN uv sync --all-extras --dev
 
 # Copy configuration and source directories
-COPY .pylintrc .
-COPY modules/ ./modules/
-COPY scripts/ ./scripts/
+COPY . .
 
 # Run pylint on both modules and scripts
 RUN uv run pylint modules scripts --rcfile=.pylintrc

@@ -1,4 +1,5 @@
 """Definitions of models and models' parameters."""
+
 import pickle
 from typing import Callable
 

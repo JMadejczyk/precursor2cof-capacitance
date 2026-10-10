@@ -1,4 +1,5 @@
 """TabPFN training pipeline module."""
+
 import copy
 import os
 import random
@@ -141,7 +142,7 @@ class TabPFNTrainingPipeline(ModelTrainingPipeline):
         custom_space = TabPFNSearchSpace.get_classifier_space(n_ensemble_range=(2, 8))
         if len(self.X.columns) > 500:
             custom_space["ignore_pretraining_limits"] = [True]
-        proper_model_name = "TabPFN Regressor"
+        # proper_model_name = "TabPFN Regressor"
         model = TunedTabPFNRegressor(random_state=42, n_validation_size=0.3, device="cuda", n_trials=100, search_space=custom_space, metric="rmse")
 
         model.fit(X.to_numpy(), y[y.columns[0]].to_numpy())

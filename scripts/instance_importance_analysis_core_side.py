@@ -3,6 +3,7 @@ Predict capacities and visualize core/side and aggregated feature importances.
 Integrates strict "microscopic" core feature extraction to ensure SHAP reference
 baselines are chemically perfect, utilizing custom model loading and scaling.
 """
+
 import itertools
 import os
 from functools import partial
@@ -13,17 +14,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import shap
+import skfp
 import yaml
 from rdkit import Chem
-from rdkit.Chem import Draw, rdDepictor, rdFMCS, rdMolDescriptors, rdmolops
+from rdkit.Chem import Draw, rdDepictor, rdMolDescriptors, rdmolops
 from rdkit.Chem.Draw import rdMolDraw2D
 from rdkit.Chem.EState import AtomTypes, EStateIndices
 from rdkit.Chem.EState.AtomTypes import _rawD
+from skfp.fingerprints import ECFPFingerprint, EStateFingerprint, FunctionalGroupsFingerprint
 
 estate_type_names = [name for name, smarts in _rawD]
-
-import skfp
-from skfp.fingerprints import ECFPFingerprint, EStateFingerprint, FunctionalGroupsFingerprint
 
 
 # =============================================================================
@@ -314,7 +314,7 @@ def predict_and_explain(smiles: str, model, scaler, numerical_features: List[str
         try:
             explainer = shap.LinearExplainer(model, train_data)
             shap_values = explainer.shap_values(feats.to_numpy())
-        except:
+        except Exception:
             explainer = shap.TreeExplainer(model, feature_perturbation="interventional", data=train_data)
             shap_values = explainer.shap_values(feats.to_numpy())
 
@@ -328,7 +328,7 @@ def predict_and_explain(smiles: str, model, scaler, numerical_features: List[str
 # 5. VISUALIZATION & UTILITIES
 # =============================================================================
 def compute_mcs_smarts(smiles_list: List[str], timeout: int = 10) -> Tuple[str, Dict[int, Tuple[int, ...]]]:
-    mols_with_core = [Chem.MolFromSmiles(s) for s in smiles_list]
+    # mols_with_core = [Chem.MolFromSmiles(s) for s in smiles_list]
     # mcs_res = rdFMCS.FindMCS(mols_with_core, timeout=timeout)
     mols = [Chem.MolFromSmiles(s) for s in smiles_list[:-1]]
     # smarts = mcs_res.smartsString or ""
@@ -396,10 +396,10 @@ def replace_circles_with_rectangles(svg: str) -> str:
 def visualize_core_side(smiles: str, core_atoms: Set[int], annot: str = "", width: int = 400, height: int = 300, core_color=(0.204, 1, 0.941, 0.4), side_color=(1.0, 0.4, 0.4, 0.4)) -> str:
     mol = Chem.MolFromSmiles(smiles)
     rdDepictor.Compute2DCoords(mol)
-    n_atoms = mol.GetNumAtoms()
+    # n_atoms = mol.GetNumAtoms()
     core_set = set(core_atoms)
-    all_atoms = set(range(n_atoms))
-    side_set = all_atoms - core_set
+    # all_atoms = set(range(n_atoms))
+    # side_set = all_atoms - core_set
 
     atom_colors = {}
     highlight_atoms = []

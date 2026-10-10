@@ -1,15 +1,17 @@
+"""Custom descriptor for COFs."""
+
 import itertools
 from functools import partial
 
 import numpy as np
 import skfp
-from predictor.features.csm_runner import CSMRunner
-from predictor.features.flatness import get_flatness_mol
 from rdkit import Chem
 from rdkit.Chem import rdDepictor, rdMolDescriptors, rdmolops
 from tqdm import tqdm
 
+from modules.features.csm_runner import CSMRunner
 from modules.features.feature_factory import FeatureFactory
+from modules.features.flatness import get_flatness_mol
 
 
 @FeatureFactory.register("descriptor")
@@ -125,9 +127,7 @@ class CustomDescriptor:
                 for i in heavy1:
                     for j in heavy2:
                         d = dist_matrix[i][j]
-                        if d > max_dist:
-                            max_dist = d
-
+                        max_dist = max(max_dist, d)
         if max_dist < 0:
             return regular_diameter
         return max_dist
@@ -143,7 +143,7 @@ class CustomDescriptor:
             mol = Chem.MolFromSmiles(s)
             if mol is None:
                 continue
-            for j, (name, func) in enumerate(self.desc.items()):
+            for j, (_, func) in enumerate(self.desc.items()):
                 moll = Chem.MolFromSmiles(s)
                 descriptors[i, j] = func(moll)
         return descriptors
