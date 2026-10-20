@@ -1,0 +1,10 @@
+binary: []
+categorical: []
+numerical:
+- custom_pattern_0
+- custom_pattern_1
+- custom_pattern_2
+- custom_pattern_3
+- custom_pattern_4
+- custom_pattern_5
+- custom_pattern_6
