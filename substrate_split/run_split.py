@@ -11,7 +11,7 @@ import pandas as pd
 from rdkit import Chem
 from rdkit.Chem.Draw import rdMolDraw2D
 
-from on_github.substrate_split.splitter import split_substrate
+from splitter import split_substrate
 
 MAIN_COLOR = (0.55, 0.75, 1.0)  # blue: main chain
 END_COLOR = (0.3, 0.85, 0.4)  # green: reactive end groups
