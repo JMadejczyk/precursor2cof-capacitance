@@ -1,0 +1,11 @@
+binary: []
+categorical: []
+numerical:
+- diameter
+- diameter_filtered
+- num_heteroatoms
+- num_rotatable_bonds
+- mol_wt
+- o%
+- n%
+- c%
