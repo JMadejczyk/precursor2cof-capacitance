@@ -189,3 +189,4 @@ __marimo__
 csm_data/
 *.model # exclude all model files
 */TabPFNModels/
+.DS_Store
