@@ -1,0 +1,78 @@
+remove_threshold: 0.99
+feature_generation:
+  # main chain only
+  - types: ["main_ecfp"]
+    params:
+      main_ecfp:
+        radius: 2
+        size: 1024
+        count: True
+  # split descriptors only
+  - types: ["split_descriptor"]
+    params:
+      split_descriptor: {}
+  # main chain + side chains
+  - types: ["main_ecfp", "side_ecfp"]
+    params:
+      main_ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      side_ecfp:
+        radius: 2
+        size: 1024
+        count: True
+  # main chain + side chains, smaller fingerprints
+  - types: ["main_ecfp", "side_ecfp"]
+    params:
+      main_ecfp:
+        radius: 2
+        size: 512
+        count: True
+      side_ecfp:
+        radius: 2
+        size: 512
+        count: True
+  # whole molecule + main chain + side chains
+  - types: ["ecfp", "main_ecfp", "side_ecfp"]
+    params:
+      ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      main_ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      side_ecfp:
+        radius: 2
+        size: 1024
+        count: True
+  # main chain + side chains + split descriptors
+  - types: ["main_ecfp", "side_ecfp", "split_descriptor"]
+    params:
+      main_ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      side_ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      split_descriptor: {}
+  # as above + the whole-molecule features of the saved best models (estate, functional groups)
+  - types: ["main_ecfp", "side_ecfp", "split_descriptor", "estate", "functional_groups"]
+    params:
+      main_ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      side_ecfp:
+        radius: 2
+        size: 1024
+        count: True
+      split_descriptor: {}
+      estate:
+        variant: 'sum'
+      functional_groups:
+        count: True

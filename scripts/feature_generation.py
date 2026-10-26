@@ -6,6 +6,11 @@ import os
 import pandas as pd
 import yaml
 
+# importing these modules registers their features in FeatureFactory
+import modules.features.custom_descriptor  # noqa: F401
+import modules.features.custom_patterns  # noqa: F401
+import modules.features.fingerprints  # noqa: F401
+import modules.features.split_fingerprints  # noqa: F401
 from modules.features.feature_factory import *  # noqa: F403
 
 parser = argparse.ArgumentParser()
