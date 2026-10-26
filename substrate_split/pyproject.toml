@@ -1,9 +1,0 @@
-[project]
-name = "substrate-split"
-version = "0.1.0"
-description = "Split COF substrates into main chain and side chains."
-requires-python = ">=3.12"
-dependencies = [
-    "rdkit>=2024.9",
-    "pandas>=2.2",
-]

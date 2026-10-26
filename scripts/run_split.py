@@ -1,6 +1,6 @@
 """Split every substrate in the dataset and write a CSV plus an HTML review page.
 
-Usage: uv run python run_split.py [--data ../cof_matched/data_substrate_cofs.csv] [--out output]
+Usage: PYTHONPATH=. uv run python scripts/run_split.py [--data cof_matched/data_substrate_cofs.csv] [--out substrate_split/output]
 """
 
 import argparse
@@ -11,7 +11,7 @@ import pandas as pd
 from rdkit import Chem
 from rdkit.Chem.Draw import rdMolDraw2D
 
-from splitter import split_substrate
+from modules.features.substrate_split import split_substrate
 
 MAIN_COLOR = (0.55, 0.75, 1.0)  # blue: main chain
 END_COLOR = (0.3, 0.85, 0.4)  # green: reactive end groups
@@ -38,19 +38,13 @@ def draw_split(split, size=(420, 320)) -> str:
         highlightBondColors=bond_colors,
     )
     drawer.FinishDrawing()
-    return drawer.GetDrawingText().replace(
-        "<?xml version='1.0' encoding='iso-8859-1'?>", ""
-    )
+    return drawer.GetDrawingText().replace("<?xml version='1.0' encoding='iso-8859-1'?>", "")
 
 
 def write_review_html(df: pd.DataFrame, svgs: list[str], path: str) -> None:
     cards = []
     for (_, row), svg in zip(df.iterrows(), svgs):
-        flags = (
-            f"<div class='flags'>{html.escape(row['flags'])}</div>"
-            if row["flags"]
-            else ""
-        )
+        flags = f"<div class='flags'>{html.escape(row['flags'])}</div>" if row["flags"] else ""
         cards.append(
             f"<div class='card' data-ctf='{int(row.is_ctf)}' data-flag='{int(bool(row['flags']))}'>"
             f"<div class='hd'>#{row.idx} · capacity {row.capacity_max:g} · ends: {html.escape(row.end_types)} ({row.n_ends})</div>{svg}"
@@ -85,7 +79,7 @@ def main():
         "--data",
         default=os.path.join(here, "..", "cof_matched", "data_substrate_cofs.csv"),
     )
-    parser.add_argument("--out", default=os.path.join(here, "output"))
+    parser.add_argument("--out", default=os.path.join(here, "..", "substrate_split", "output"))
     args = parser.parse_args()
     os.makedirs(args.out, exist_ok=True)
 
@@ -114,17 +108,8 @@ def main():
     df = pd.DataFrame(rows)
     df.to_csv(os.path.join(args.out, "substrate_split.csv"), index=False)
     write_review_html(df, svgs, os.path.join(args.out, "review.html"))
-    print(
-        f"{len(df)} substrates, {df.is_ctf.sum()} CTF, {(df.n_side_chains > 0).sum()} with side chains"
-    )
-    print(
-        df["flags"]
-        .str.split(";")
-        .explode()
-        .value_counts()
-        .drop("", errors="ignore")
-        .to_string()
-    )
+    print(f"{len(df)} substrates, {df.is_ctf.sum()} CTF, {(df.n_side_chains > 0).sum()} with side chains")
+    print(df["flags"].str.split(";").explode().value_counts().drop("", errors="ignore").to_string())
 
 
 if __name__ == "__main__":
