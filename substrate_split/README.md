@@ -1,20 +1,22 @@
 # substrate_split
 
-Splits each COF substrate into a **main chain** and **side chains** 
-It's separate from `precursor2cof-capacitance/` and doesn't import or modify it.
+Splits each COF substrate into a **main chain** and **side chains**
+The splitter lives in `modules/features/substrate_split.py` and the review script in `scripts/run_split.py`;
+this folder keeps the documentation and the review output. Fingerprints of the split are in
+`modules/features/split_fingerprints.py` (`main_ecfp`, `side_ecfp`, `split_descriptor`).
 
 ## Run
+From the repository root, with the main environment (`uv sync`):
 ```bash
-uv sync
-uv run python run_split.py            # reads ../cof_matched/data_substrate_cofs.csv
+PYTHONPATH=. uv run python scripts/run_split.py     # reads cof_matched/data_substrate_cofs.csv
 ```
-Outputs in `output/`:
+Outputs in `substrate_split/output/`:
 - `substrate_split.csv`: one row per substrate: `end_types`, `n_ends`, `main_chain_smiles`,
   `side_chain_smiles` (joined by `.`, `*` = attachment point), atom counts, `flags`.
 - `review.html`: every substrate drawn with end groups (green), main chain (blue), side chains (red).
   Has filters for "CTF only" and "flagged only".
 
-## How the split works (`splitter.py`)
+## How the split works (`modules/features/substrate_split.py`)
 1. **End groups.** Tier 1: nitrile, aldehyde, primary amine, boronic acid, terminal alkyne, SnMe3.
    Tier 2 (halides, phenol OH) is added only if tier 1 finds < 2 ends. Halides are also added when a
    cross-coupling group (boronic acid / alkyne / stannane) is present.
