@@ -6,4 +6,5 @@ requires-python = ">=3.12"
 dependencies = [
     "rdkit>=2024.9",
     "pandas>=2.2",
+    "openpyxl>=3.1",
 ]
