@@ -40,8 +40,10 @@ if __name__ == "__main__":
         features_strings = [f"{f_type}_" + "_".join(str(v) for v in f_params.get(f_type, {}).values()) for f_type in f_types]
         output_dir_csv = os.path.join(args.output_dir, f"rth_{rth}", "features")
         output_dir_ftypes = os.path.join(args.output_dir, f"rth_{rth}", "feature_types")
-        output_path_csv = os.path.join(f"{output_dir_csv}", f"features_rth_{rth}_" + "_".join(features_strings) + ".csv")
-        output_path_ftypes = os.path.join(f"{output_dir_ftypes}", f"feature_types_rth_{rth}_" + "_".join(features_strings) + ".yaml")
+        # optional short name: joining many feature strings can exceed the file name length limit
+        combo_name = combo.get("name", "_".join(features_strings))
+        output_path_csv = os.path.join(f"{output_dir_csv}", f"features_rth_{rth}_{combo_name}.csv")
+        output_path_ftypes = os.path.join(f"{output_dir_ftypes}", f"feature_types_rth_{rth}_{combo_name}.yaml")
 
         df_created = {}
         for i, feature_string in enumerate(features_strings):

@@ -1,0 +1,75 @@
+# Main experiment with ECFP and the feature sets that worked best in the greedy forward
+# selection (notebooks/greedy_selection_analysis.ipynb): RF = EState + functional groups,
+# BRR = custom descriptor + ECFP + EState + functional groups. Each is computed for the
+# whole substrate, for the main chain + side chains, and for all three together.
+remove_threshold: 0.99
+feature_generation:
+  - name: 'ecfp_substrate'
+    types: ["ecfp"]
+    params:
+      ecfp: {radius: 2, size: 1024, count: True}
+  - name: 'ecfp_main_side'
+    types: ["main_ecfp", "side_ecfp"]
+    params:
+      main_ecfp: {radius: 2, size: 1024, count: True}
+      side_ecfp: {radius: 2, size: 1024, count: True}
+  - name: 'ecfp_substrate_main_side'
+    types: ["ecfp", "main_ecfp", "side_ecfp"]
+    params:
+      ecfp: {radius: 2, size: 1024, count: True}
+      main_ecfp: {radius: 2, size: 1024, count: True}
+      side_ecfp: {radius: 2, size: 1024, count: True}
+  - name: 'rf_best_substrate'
+    types: ["estate", "functional_groups"]
+    params:
+      estate: {variant: 'sum'}
+      functional_groups: {count: True}
+  - name: 'rf_best_main_side'
+    types: ["main_estate", "main_functional_groups", "side_estate", "side_functional_groups"]
+    params:
+      main_estate: {variant: 'sum'}
+      main_functional_groups: {count: True}
+      side_estate: {variant: 'sum'}
+      side_functional_groups: {count: True}
+  - name: 'rf_best_substrate_main_side'
+    types: ["estate", "functional_groups", "main_estate", "main_functional_groups", "side_estate", "side_functional_groups"]
+    params:
+      estate: {variant: 'sum'}
+      functional_groups: {count: True}
+      main_estate: {variant: 'sum'}
+      main_functional_groups: {count: True}
+      side_estate: {variant: 'sum'}
+      side_functional_groups: {count: True}
+  - name: 'brr_best_substrate'
+    types: ["descriptor", "ecfp", "estate", "functional_groups"]
+    params:
+      descriptor: {flatness: False, symmetry: False}
+      ecfp: {radius: 2, size: 1024, count: True}
+      estate: {variant: 'sum'}
+      functional_groups: {count: True}
+  - name: 'brr_best_main_side'
+    types: ["main_descriptor", "main_ecfp", "main_estate", "main_functional_groups", "side_descriptor", "side_ecfp", "side_estate", "side_functional_groups"]
+    params:
+      main_descriptor: {flatness: False, symmetry: False}
+      main_ecfp: {radius: 2, size: 1024, count: True}
+      main_estate: {variant: 'sum'}
+      main_functional_groups: {count: True}
+      side_descriptor: {flatness: False, symmetry: False}
+      side_ecfp: {radius: 2, size: 1024, count: True}
+      side_estate: {variant: 'sum'}
+      side_functional_groups: {count: True}
+  - name: 'brr_best_substrate_main_side'
+    types: ["descriptor", "ecfp", "estate", "functional_groups", "main_descriptor", "main_ecfp", "main_estate", "main_functional_groups", "side_descriptor", "side_ecfp", "side_estate", "side_functional_groups"]
+    params:
+      descriptor: {flatness: False, symmetry: False}
+      ecfp: {radius: 2, size: 1024, count: True}
+      estate: {variant: 'sum'}
+      functional_groups: {count: True}
+      main_descriptor: {flatness: False, symmetry: False}
+      main_ecfp: {radius: 2, size: 1024, count: True}
+      main_estate: {variant: 'sum'}
+      main_functional_groups: {count: True}
+      side_descriptor: {flatness: False, symmetry: False}
+      side_ecfp: {radius: 2, size: 1024, count: True}
+      side_estate: {variant: 'sum'}
+      side_functional_groups: {count: True}

@@ -7,8 +7,11 @@ from rdkit import Chem
 from rdkit.Chem import rdmolops
 from skfp.fingerprints import ECFPFingerprint
 
+from modules.features.custom_descriptor import descriptor
 from modules.features.feature_factory import FeatureFactory
+from modules.features.fingerprints import estate_fingerprint, functional_groups_fingerprint
 from modules.features.substrate_split import TIER1_END_GROUPS, TIER2_END_GROUPS, Split, split_substrate
+from modules.features.utils import fingerprint_feature_types
 
 END_GROUP_NAMES = [name for name, _ in TIER1_END_GROUPS + TIER2_END_GROUPS]
 
@@ -45,6 +48,64 @@ def side_ecfp_fingerprint(size: int = 1024, radius: int = 2, count: bool = False
     :return: SplitECFP object.
     """
     return SplitECFP(part="side", size=size, radius=radius, count=count)
+
+
+@FeatureFactory.register("main_estate")
+def main_estate_fingerprint(variant: str = "sum") -> object:
+    """
+    Generate estate fingerprints of the main chain.
+    :param variant: type of estate fingerprint.
+    :return: SplitFeatures object.
+    """
+    return SplitFeatures("main", "estate", estate_fingerprint(variant), variant=variant)
+
+
+@FeatureFactory.register("side_estate")
+def side_estate_fingerprint(variant: str = "sum") -> object:
+    """
+    Generate estate fingerprints of all side chains together.
+    :param variant: type of estate fingerprint.
+    :return: SplitFeatures object.
+    """
+    return SplitFeatures("side", "estate", estate_fingerprint(variant), variant=variant)
+
+
+@FeatureFactory.register("main_functional_groups")
+def main_functional_groups_fingerprint(count: bool = False) -> object:
+    """
+    Generate functional groups fingerprints of the main chain.
+    :param count: whether to include counts or to use binary values.
+    :return: SplitFeatures object.
+    """
+    return SplitFeatures("main", "functional_groups", functional_groups_fingerprint(count), count=count)
+
+
+@FeatureFactory.register("side_functional_groups")
+def side_functional_groups_fingerprint(count: bool = False) -> object:
+    """
+    Generate functional groups fingerprints of all side chains together.
+    :param count: whether to include counts or to use binary values.
+    :return: SplitFeatures object.
+    """
+    return SplitFeatures("side", "functional_groups", functional_groups_fingerprint(count), count=count)
+
+
+@FeatureFactory.register("main_descriptor")
+def main_descriptor(flatness: bool = False, symmetry: bool = False) -> object:
+    """
+    Generate custom molecular descriptors of the main chain.
+    :return: SplitFeatures object.
+    """
+    return SplitFeatures("main", "descriptor", part_descriptor(flatness, symmetry))
+
+
+@FeatureFactory.register("side_descriptor")
+def side_descriptor(flatness: bool = False, symmetry: bool = False) -> object:
+    """
+    Generate custom molecular descriptors of all side chains together.
+    :return: SplitFeatures object.
+    """
+    return SplitFeatures("side", "descriptor", part_descriptor(flatness, symmetry))
 
 
 @FeatureFactory.register("split_descriptor")
@@ -88,6 +149,88 @@ class SplitECFP:
         """
         mols = [Chem.MolFromSmiles(self.fragment_smiles(s)) for s in smiles]
         return self.fp.transform(mols)
+
+
+def part_descriptor(flatness: bool = False, symmetry: bool = False) -> object:
+    """
+    Custom descriptors for a part that can consist of several separate side chains.
+    Distances between separate pieces are undefined, so diameters are the largest within one piece.
+    :return: CustomDescriptor object.
+    """
+    custom_descriptor = descriptor(flatness, symmetry)
+    for name in ("diameter", "diameter_filtered"):
+        diameter = custom_descriptor.desc[name]
+        custom_descriptor.desc[name] = lambda mol, diameter=diameter: max(diameter(piece) for piece in Chem.GetMolFrags(mol, asMols=True))
+    return custom_descriptor
+
+
+def capped_fragment_smiles(smiles: str, part: str) -> str:
+    """
+    Get one part of the split as a molecule of its own: every cut point (*) becomes a hydrogen.
+    :param smiles: SMILES string of the substrate.
+    :param part: 'main' or 'side'.
+    :return: SMILES of the part (side chains joined by '.', empty if there are none).
+    """
+    split = cached_split(smiles)
+    fragment = split.main_chain_smiles if part == "main" else ".".join(split.side_chain_smiles)
+    if not fragment:
+        return ""
+    mol = Chem.MolFromSmiles(fragment)
+    for atom in mol.GetAtoms():
+        if atom.GetAtomicNum() == 0:
+            atom.SetAtomicNum(1)
+    return Chem.MolToSmiles(Chem.RemoveHs(mol))
+
+
+class SplitFeatures:
+    """
+    Any whole-molecule feature computed on one part of the split instead. Cut points are
+    capped with hydrogens, so descriptors and atom-type features see an ordinary molecule.
+    A substrate without side chains gets an all-zero side row.
+    """
+
+    def __init__(self, part: str, name: str, features: object, **kwargs):
+        if part not in ("main", "side"):
+            raise ValueError(f"part must be 'main' or 'side', got '{part}'")
+        self.part = part
+        self.name = name
+        self.features = features
+        self.kwargs = kwargs
+        self.num_features = 0
+
+    def fit_transform(self, smiles: list) -> np.ndarray:
+        """
+        Features of the selected part for every substrate.
+        :param smiles: list of SMILES strings.
+        :return: array with features.
+        """
+        fragments = [capped_fragment_smiles(s, self.part) for s in smiles]
+        present = [i for i, fragment in enumerate(fragments) if fragment]
+        values = np.asarray(self.features.fit_transform([fragments[i] for i in present]), dtype=float)
+        self.num_features = values.shape[1]
+        features = np.zeros((len(smiles), self.num_features))
+        features[present] = values
+        return features
+
+    def get_feature_names_out(self) -> list:
+        """
+        Get feature names: the whole-molecule names prefixed with the part.
+        :return: list of feature names.
+        """
+        if hasattr(self.features, "get_feature_types"):
+            names = self.features.get_feature_names_out()
+        else:
+            names = [f"{self.name}_{i}" for i in range(self.num_features)]
+        return [f"{self.part}_{name}" for name in names]
+
+    def get_feature_types(self) -> dict:
+        """
+        Get feature types, the same as for the whole-molecule feature.
+        :return: dictionary with feature types.
+        """
+        if hasattr(self.features, "get_feature_types"):
+            return {f_type: [f"{self.part}_{name}" for name in names] for f_type, names in self.features.get_feature_types().items()}
+        return fingerprint_feature_types(self.name, self.get_feature_names_out(), **self.kwargs)
 
 
 class SplitDescriptor:
