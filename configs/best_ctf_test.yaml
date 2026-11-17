@@ -1,0 +1,21 @@
+# for scripts/models_training_cft_cof.py: test on CTFs only, the other COFs are always in training
+save_dir: 'results/best_ctf_test/'
+datasets_dir: 'cof_matched_best/rth_0.99/'
+dataset_params:
+  num_folds: 10
+  num_bins: 5
+  num_bins_hyperparam_opt: 5
+models: [
+  'random_forest',
+  'bayes',
+]
+metrics: [
+  'pairwise_accuracy_score',
+  'ndcg_score',
+  'rmse',
+  'mae',
+  'mape',
+  'smape',
+  'r2_score'
+]
+hyperparam_opt: True
