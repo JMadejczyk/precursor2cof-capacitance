@@ -182,7 +182,7 @@ def fingerprint_feature_types(name: str, feature_names: list[str], **kwargs) -> 
     :param kwargs: additional arguments for the fingerprint generation.
     :return: dictionary with feature types.
     """
-    if name == "ecfp":
+    if name in ["ecfp", "main_ecfp", "side_ecfp"]:
         count = kwargs.get("count", False)
         if count:
             return {"categorical": [], "binary": [], "numerical": feature_names}

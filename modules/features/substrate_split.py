@@ -43,7 +43,7 @@ from dataclasses import dataclass, field
 from rdkit import Chem
 from rdkit.Chem import rdmolops
 
-from manual_ends import MANUAL_ENDS
+from modules.features.manual_ends import MANUAL_ENDS
 
 # (name, SMARTS); the first atom of each match is the anchor bonded to the rest of the molecule.
 TIER1_END_GROUPS = [
@@ -71,15 +71,11 @@ TIER2_END_GROUPS = [
 HALIDES = {"bromide", "chloride", "iodide"}
 # Cross-coupling groups: their partner end is a halide, so halides count as ends too.
 COUPLING_GROUPS = {"boronic_acid", "alkyne", "stannane"}
-_PATTERNS = {
-    name: Chem.MolFromSmarts(s) for name, s in TIER1_END_GROUPS + TIER2_END_GROUPS
-}
+_PATTERNS = {name: Chem.MolFromSmarts(s) for name, s in TIER1_END_GROUPS + TIER2_END_GROUPS}
 _BENZOXAZINE = Chem.MolFromSmarts("N1COc2ccccc2C1")
 _ARYL_BROMIDE = Chem.MolFromSmarts("[Br]c")
 _ARYL_METHYL = Chem.MolFromSmarts("[CH3]c")
-_MANUAL = {
-    Chem.MolToSmiles(Chem.MolFromSmiles(e["smiles"])): e for e in MANUAL_ENDS
-}
+_MANUAL = {Chem.MolToSmiles(Chem.MolFromSmiles(e["smiles"])): e for e in MANUAL_ENDS}
 
 
 @dataclass
@@ -129,9 +125,7 @@ def _manual_atoms(mol: Chem.Mol, entry: dict, key: str) -> list[int]:
     return [match[i] for i in entry.get(key, ())]
 
 
-def _keep_manual_ends(
-    mol: Chem.Mol, ends: list[tuple[str, tuple[int, ...]]], entry: dict
-) -> list[tuple[str, tuple[int, ...]]]:
+def _keep_manual_ends(mol: Chem.Mol, ends: list[tuple[str, tuple[int, ...]]], entry: dict) -> list[tuple[str, tuple[int, ...]]]:
     """Ends listed in the entry's "anchors"; every end if the entry has no "anchors"."""
     if "anchors" not in entry:
         return ends
@@ -148,39 +142,17 @@ def find_end_groups(
     present); otherwise tier 1 + tier 2 together (e.g. one NH2 + two Br in a
     Buchwald monomer); otherwise no ends.
     """
-    tier1 = [
-        (name, m)
-        for name, _ in TIER1_END_GROUPS
-        for m in mol.GetSubstructMatches(_PATTERNS[name])
-    ]
+    tier1 = [(name, m) for name, _ in TIER1_END_GROUPS for m in mol.GetSubstructMatches(_PATTERNS[name])]
     ends, flags = tier1, []
     if {name for name, _ in tier1} & COUPLING_GROUPS:
-        ends = tier1 + [
-            (name, m)
-            for name, _ in TIER2_END_GROUPS
-            if name in HALIDES
-            for m in mol.GetSubstructMatches(_PATTERNS[name])
-        ]
+        ends = tier1 + [(name, m) for name, _ in TIER2_END_GROUPS if name in HALIDES for m in mol.GetSubstructMatches(_PATTERNS[name])]
     if len(tier1) < 2:
-        ends = tier1 + [
-            (name, m)
-            for name, _ in TIER2_END_GROUPS
-            for m in mol.GetSubstructMatches(_PATTERNS[name])
-        ]
+        ends = tier1 + [(name, m) for name, _ in TIER2_END_GROUPS for m in mol.GetSubstructMatches(_PATTERNS[name])]
         flags.append("tier2_ends")
     if mol.HasSubstructMatch(_BENZOXAZINE):
-        ends = _add_ends(
-            ends, "hydroxyl", mol.GetSubstructMatches(_PATTERNS["hydroxyl"])
-        )
-    if (
-        ends
-        and {name for name, _ in ends} == {"amine"}
-        and mol.HasSubstructMatch(_ARYL_BROMIDE)
-        and _on_one_ring(mol, [m[0] for _, m in ends])
-    ):
-        ends = _add_ends(
-            ends, "bromide", mol.GetSubstructMatches(_PATTERNS["bromide"])
-        )
+        ends = _add_ends(ends, "hydroxyl", mol.GetSubstructMatches(_PATTERNS["hydroxyl"]))
+    if ends and {name for name, _ in ends} == {"amine"} and mol.HasSubstructMatch(_ARYL_BROMIDE) and _on_one_ring(mol, [m[0] for _, m in ends]):
+        ends = _add_ends(ends, "bromide", mol.GetSubstructMatches(_PATTERNS["bromide"]))
     entry = _manual_entry(mol)
     if entry:
         ends = _keep_manual_ends(mol, ends, entry)
@@ -233,11 +205,7 @@ def _add_exocyclic_double_bonded(mol: Chem.Mol, atoms: set[int]) -> set[int]:
     for idx in atoms:
         for bond in mol.GetAtomWithIdx(idx).GetBonds():
             nbr = bond.GetOtherAtom(mol.GetAtomWithIdx(idx))
-            if (
-                nbr.GetIdx() not in atoms
-                and nbr.GetDegree() == 1
-                and bond.GetBondType() == Chem.BondType.DOUBLE
-            ):
+            if nbr.GetIdx() not in atoms and nbr.GetDegree() == 1 and bond.GetBondType() == Chem.BondType.DOUBLE:
                 extra.add(nbr.GetIdx())
     return atoms | extra
 
@@ -257,20 +225,12 @@ def _components(mol: Chem.Mol, atoms: set[int]) -> list[set[int]]:
     return sorted(comps, key=min)
 
 
-def _fragment_smiles(
-    mol: Chem.Mol, main_atoms: set[int], side_chains: list[set[int]]
-) -> tuple[str, list[str]]:
+def _fragment_smiles(mol: Chem.Mol, main_atoms: set[int], side_chains: list[set[int]]) -> tuple[str, list[str]]:
     """Cut main/side bonds, put a '*' at each cut, return main-chain and side-chain SMILES."""
-    cut = [
-        b.GetIdx()
-        for b in mol.GetBonds()
-        if (b.GetBeginAtomIdx() in main_atoms) != (b.GetEndAtomIdx() in main_atoms)
-    ]
+    cut = [b.GetIdx() for b in mol.GetBonds() if (b.GetBeginAtomIdx() in main_atoms) != (b.GetEndAtomIdx() in main_atoms)]
     if not cut:
         return Chem.MolToSmiles(mol), []
-    frag = Chem.FragmentOnBonds(
-        mol, cut, addDummies=True, dummyLabels=[(0, 0)] * len(cut)
-    )
+    frag = Chem.FragmentOnBonds(mol, cut, addDummies=True, dummyLabels=[(0, 0)] * len(cut))
     frag_atom_sets = Chem.GetMolFrags(frag, asMols=False, sanitizeFrags=False)
     frag_mols = Chem.GetMolFrags(frag, asMols=True, sanitizeFrags=False)
     main_smi, side_smis = "", {}

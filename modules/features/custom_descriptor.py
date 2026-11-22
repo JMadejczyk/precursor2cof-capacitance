@@ -41,7 +41,8 @@ class CustomDescriptor:
     """
 
     def __init__(self, flatness: bool = False, symmetry: bool = False):
-        self.csm_runner = CSMRunner()
+        # the CSM container is only needed for the symmetry descriptor
+        self.csm_runner = CSMRunner() if symmetry else None
 
         self.desc = {
             # "radius": skfp.descriptors.radius,

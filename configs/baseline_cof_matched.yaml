@@ -1,0 +1,24 @@
+save_dir: 'results/baseline_cof_matched_rth_0.99/'
+datasets_dir: 'cof_matched/rth_0.99/'
+dataset_params:
+  num_folds: 10
+  num_bins: 10
+  num_bins_hyperparam_opt: 10
+models: [
+  'knn',
+  'xgboost',
+  'random_forest',
+  'lasso',
+  'bayes',
+  'mlp',
+]
+metrics: [
+  'pairwise_accuracy_score',
+  'ndcg_score',
+  'rmse',
+  'mae',
+  'mape',
+  'smape',
+  'r2_score'
+]
+hyperparam_opt: True
