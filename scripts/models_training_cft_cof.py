@@ -28,6 +28,7 @@ if __name__ == "__main__":
     models_to_train = config["models"]
     hyperparameters = config["hyperparam_opt"]
     metrics = config["metrics"]
+    target_col = config.get("target_col", "capacity_max")
 
     data_config = config.get("dataset_params", {})
     num_bins_hyperopt = data_config.get("num_bins_hyperparam_opt", 5)
@@ -58,8 +59,8 @@ if __name__ == "__main__":
             for d_name in datasets_chemprop:
                 dataset, feature_types = datasets_chemprop[d_name]
                 cof_types = cft_cof_filter(dataset["smiles"])
-                X = dataset.drop(columns=["capacity_max"])
-                y = dataset[["capacity_max"]]
+                X = dataset.drop(columns=[target_col])
+                y = dataset[[target_col]]
                 folds = custom_data_kfold_ctf_cof(X, y, cof_types, num_splits=num_folds, num_bins=num_bins, random_state=42)
 
                 save_dir = os.path.join(results_dir, model, d_name)
@@ -94,8 +95,8 @@ if __name__ == "__main__":
             for d_name in datasets:
                 dataset, feature_types = datasets[d_name]
                 cof_types = cft_cof_filter(dataset["smiles"])
-                X = dataset.drop(columns=["capacity_max", "smiles"])
-                y = dataset[["capacity_max"]]
+                X = dataset.drop(columns=[target_col, "smiles"])
+                y = dataset[[target_col]]
                 folds = custom_data_kfold_ctf_cof(X, y, cof_types, num_splits=num_folds, num_bins=num_bins, random_state=42)
 
                 save_dir = os.path.join(results_dir, model, d_name)

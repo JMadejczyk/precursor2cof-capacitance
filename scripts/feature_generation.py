@@ -17,6 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--data_path", type=str, required=True, help="Path to the input data file - raw dataset")
 parser.add_argument("--output_dir", type=str, required=True, help="Path to directory to save the processed data")
 parser.add_argument("--config", type=str, required=True, help="Path to the feature generation configuration file")
+parser.add_argument("--target_col", type=str, default="capacity_max", help="Name of the target column in the data file")
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -60,7 +61,7 @@ if __name__ == "__main__":
             print("-" * 50)
             continue
 
-        df_features, dict_feature_types = generate_features(df, df_created, smiles_col="smiles", target_col="capacity_max", feature_types=f_types, remove_threshold=rth, kwargs=f_params)  # noqa: F405
+        df_features, dict_feature_types = generate_features(df, df_created, smiles_col="smiles", target_col=args.target_col, feature_types=f_types, remove_threshold=rth, kwargs=f_params)  # noqa: F405
 
         os.makedirs(os.path.dirname(output_path_csv), exist_ok=True)
         os.makedirs(os.path.dirname(output_path_ftypes), exist_ok=True)
