@@ -1,0 +1,27 @@
+# Main experiment on the electrocatalysis data (target JD_max, maximum diffusion current density).
+# Features: generated from electrocatalysis/data_electrocatalysis.csv with configs/best_feature_generation.yaml.
+save_dir: 'results/electrocatalysis/'
+datasets_dir: 'electrocatalysis/rth_0.99/'
+target_col: 'JD_max'
+dataset_params:
+  num_folds: 10
+  num_bins: 5
+  num_bins_hyperparam_opt: 5
+models: [
+  'knn',
+  'xgboost',
+  'random_forest',
+  'lasso',
+  'bayes',
+  'mlp',
+]
+# no ndcg_score: it needs non-negative targets, and JD_max is negative
+metrics: [
+  'pairwise_accuracy_score',
+  'rmse',
+  'mae',
+  'mape',
+  'smape',
+  'r2_score'
+]
+hyperparam_opt: True

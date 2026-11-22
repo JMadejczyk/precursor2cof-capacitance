@@ -70,6 +70,20 @@ class CustomDescriptor:
                     "symmetry": partial(self.calculate_symmetry, point_group=["c2", "c3", "c4"]),
                 }
             )
+        # distances between separate pieces (e.g. two substrates of one COF) are undefined,
+        # so diameters are the largest within one piece; one-piece molecules are unchanged
+        for name in ("diameter", "diameter_filtered"):
+            self.desc[name] = partial(self.largest_in_piece, self.desc[name])
+
+    @staticmethod
+    def largest_in_piece(func, mol: Chem.Mol) -> float:
+        """
+        Largest value of a descriptor over the separate pieces of a molecule.
+        :param func: descriptor function.
+        :param mol: RDKit molecule object.
+        :return: largest value over the pieces.
+        """
+        return max(func(piece) for piece in Chem.GetMolFrags(mol, asMols=True))
 
     @staticmethod
     def calculate_percentage(mol: Chem.Mol, idx: int) -> float:

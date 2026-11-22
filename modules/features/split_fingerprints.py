@@ -26,6 +26,21 @@ def cached_split(smiles: str) -> Split:
     return split_substrate(smiles)
 
 
+@lru_cache(maxsize=None)
+def split_parts(smiles: str) -> tuple[str, tuple[str, ...]]:
+    """
+    Split every substrate of a SMILES separately; a COF made from two substrates is given as 's1.s2'.
+    :param smiles: SMILES string of one or more substrates.
+    :return: main chains joined by '.', and all side chains.
+    """
+    main_chains, side_chains = [], []
+    for substrate in smiles.split("."):
+        split = cached_split(substrate)
+        main_chains.append(split.main_chain_smiles)
+        side_chains.extend(split.side_chain_smiles)
+    return ".".join(main_chains), tuple(side_chains)
+
+
 @FeatureFactory.register("main_ecfp")
 def main_ecfp_fingerprint(size: int = 1024, radius: int = 2, count: bool = False) -> object:
     """
@@ -96,7 +111,7 @@ def main_descriptor(flatness: bool = False, symmetry: bool = False) -> object:
     Generate custom molecular descriptors of the main chain.
     :return: SplitFeatures object.
     """
-    return SplitFeatures("main", "descriptor", part_descriptor(flatness, symmetry))
+    return SplitFeatures("main", "descriptor", descriptor(flatness, symmetry))
 
 
 @FeatureFactory.register("side_descriptor")
@@ -105,7 +120,7 @@ def side_descriptor(flatness: bool = False, symmetry: bool = False) -> object:
     Generate custom molecular descriptors of all side chains together.
     :return: SplitFeatures object.
     """
-    return SplitFeatures("side", "descriptor", part_descriptor(flatness, symmetry))
+    return SplitFeatures("side", "descriptor", descriptor(flatness, symmetry))
 
 
 @FeatureFactory.register("split_descriptor")
@@ -136,10 +151,10 @@ class SplitECFP:
         :param smiles: SMILES string of the substrate.
         :return: main-chain SMILES, or side chains joined by '.' (empty if none).
         """
-        split = cached_split(smiles)
+        main_chains, side_chains = split_parts(smiles)
         if self.part == "main":
-            return split.main_chain_smiles
-        return ".".join(split.side_chain_smiles)
+            return main_chains
+        return ".".join(side_chains)
 
     def fit_transform(self, smiles: list) -> np.ndarray:
         """
@@ -151,35 +166,29 @@ class SplitECFP:
         return self.fp.transform(mols)
 
 
-def part_descriptor(flatness: bool = False, symmetry: bool = False) -> object:
-    """
-    Custom descriptors for a part that can consist of several separate side chains.
-    Distances between separate pieces are undefined, so diameters are the largest within one piece.
-    :return: CustomDescriptor object.
-    """
-    custom_descriptor = descriptor(flatness, symmetry)
-    for name in ("diameter", "diameter_filtered"):
-        diameter = custom_descriptor.desc[name]
-        custom_descriptor.desc[name] = lambda mol, diameter=diameter: max(diameter(piece) for piece in Chem.GetMolFrags(mol, asMols=True))
-    return custom_descriptor
-
-
 def capped_fragment_smiles(smiles: str, part: str) -> str:
     """
-    Get one part of the split as a molecule of its own: every cut point (*) becomes a hydrogen.
+    Get one part of the split as a molecule of its own: every cut point (*) is removed and the
+    free valences are filled with hydrogens, also for cut double bonds (e.g. a ring C=O in the side chains).
     :param smiles: SMILES string of the substrate.
     :param part: 'main' or 'side'.
     :return: SMILES of the part (side chains joined by '.', empty if there are none).
     """
-    split = cached_split(smiles)
-    fragment = split.main_chain_smiles if part == "main" else ".".join(split.side_chain_smiles)
+    main_chains, side_chains = split_parts(smiles)
+    fragment = main_chains if part == "main" else ".".join(side_chains)
     if not fragment:
         return ""
     mol = Chem.MolFromSmiles(fragment)
-    for atom in mol.GetAtoms():
-        if atom.GetAtomicNum() == 0:
-            atom.SetAtomicNum(1)
-    return Chem.MolToSmiles(Chem.RemoveHs(mol))
+    # in the Kekule form a removed cut point leaves plain free valences instead of a broken aromatic ring
+    Chem.Kekulize(mol, clearAromaticFlags=True)
+    mol = Chem.RWMol(mol)
+    cut_points = [atom for atom in mol.GetAtoms() if atom.GetAtomicNum() == 0]
+    for atom in sorted(cut_points, key=lambda a: a.GetIdx(), reverse=True):
+        for neighbor in atom.GetNeighbors():
+            neighbor.SetNoImplicit(False)
+        mol.RemoveAtom(atom.GetIdx())
+    Chem.SanitizeMol(mol)
+    return Chem.MolToSmiles(mol)
 
 
 class SplitFeatures:
