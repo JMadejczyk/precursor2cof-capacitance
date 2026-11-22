@@ -1,0 +1,33 @@
+# Electrocatalysis (J) experiment. Paths are relative to the repo root; run every script from there.
+
+# Raw spreadsheet from the project owner (not in the repo: it contains unpublished in-house materials).
+raw_xlsx: 'experiments/electrocatalysis/data/data_electrocatalysis.xlsx'
+# Output of clean.py (in the repo).
+clean_csv: 'experiments/electrocatalysis/data/electro_clean.csv'
+work_dir: 'experiments/electrocatalysis/results'
+
+# Julia's feature sets (ECFP; RF best = EState + FG; BRR best = descriptor + ECFP + EState + FG), each as
+# substrate / main + side / both. MACCS is added in features.py with the same three variants.
+feature_sets_config: 'configs/best_feature_generation.yaml'
+add_maccs: True
+
+# Leave-one-paper-out for every correction method; the random split only for raw J, to show how much it overstates.
+methods: ['none', 'center', 'zscore', 'combat', 'mixed']
+random_cv: {num_folds: 5, num_repeats: 10, num_bins: 5, random_state: 42}
+
+# A median baseline is always added. Lasso is left out (untuned default alpha is unreliable).
+models: ['bayes', 'random_forest', 'xgboost', 'knn']
+shap_models: ['bayes', 'random_forest', 'xgboost']
+tabpfn:
+  enabled: False   # adds about 50 min on an M1 Pro CPU; set device to 'cuda' on the 3090
+  device: 'cpu'
+
+# permutation.py: the top configurations by within-paper accuracy per subset get a within-paper shuffle test.
+permutation: {top_k: 3, n_perm: 100}
+
+# final_model.py: the configuration to fit on all papers for explainability.
+final_model:
+  subset: 'clean'
+  method: 'zscore'
+  model: 'random_forest'
+  table: 'a1_full__ecfp'

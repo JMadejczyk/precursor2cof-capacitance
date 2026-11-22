@@ -1,0 +1,10 @@
+number,column,old,new,reason,confidence
+57,smiles_2,C1=CC(ONN)=CC=C1C2=CC(C)=CC(ONN)=C2,C1=CC(C(=O)NN)=CC=C1C2=CC(C)=CC(C(=O)NN)=C2,hydrazide written as ONN,medium
+58,smiles_2,C1=CC=C(C=C1ONN)C2=CC=CC(=C2)C(=O)NN,C1=CC=C(C=C1C(=O)NN)C2=CC=CC(=C2)C(=O)NN,hydrazide written as ONN,medium
+59,smiles_2,[Br-].C[N+](C)(C)c1cc(ONN)ccc1-c1ccc(ONN)cc1,[Br-].C[N+](C)(C)c1cc(C(=O)NN)ccc1-c1ccc(C(=O)NN)cc1,hydrazide written as ONN,medium
+59,smiles_2,[Br-].C[N+](C)(C)c1cc(C(=O)NN)ccc1-c1ccc(C(=O)NN)cc1,C[N+](C)(C)c1cc(C(=O)NN)ccc1-c1ccc(C(=O)NN)cc1,removed counter-ion,high
+28,smiles_2,O=CC1=CC2C(=C3C=C(C=O)SC3C3C=C(C=O)SC23)S1,O=Cc1cc2c(s1)c1cc(C=O)sc1c1cc(C=O)sc21,broken aromatic drawing; same skeleton drawn correctly elsewhere in the file,high
+38,smiles_1,O=CC1=CC2C(=C3C=C(C=O)SC3C3C=C(C=O)SC23)S1,O=Cc1cc2c(s1)c1cc(C=O)sc1c1cc(C=O)sc21,broken aromatic drawing; same skeleton drawn correctly elsewhere in the file,high
+39,smiles_1,O=CC1=CC2C(=C3C=C(C=O)SC3C3C=C(C=O)SC23)S1,O=Cc1cc2c(s1)c1cc(C=O)sc1c1cc(C=O)sc21,broken aromatic drawing; same skeleton drawn correctly elsewhere in the file,high
+41,smiles_1,Nc1ccc(C2=CC(c3ccc(N)cc3)=C3C=CC4=C(c5ccc(N)cc5)C=C(c5ccc(N)cc5)C5=CC=C2C3C54)cc1,Nc1ccc(-c2cc(-c3ccc(N)cc3)c3ccc4c(-c5ccc(N)cc5)cc(-c5ccc(N)cc5)c5ccc2c3c54)cc1,broken aromatic drawing; same skeleton drawn correctly elsewhere in the file,high
+67,smiles_1,Nc1ccc(C2=CC3C(C=C2)C(=C2C4C=CC(c5ccc(N)cc5)=CC4C4C=C(c5ccc(N)cc5)C=CC24)C2C=CC(c4ccc(N)cc4)=CC23)cc1,Nc1ccc(C2=CC3C(C=C2)C(=C2C4C=CC(c5ccc(N)cc5)=CC4C4C=C(c5ccc(N)cc5)C=CC24)C2C=CC(c4ccc(N)cc4)=CC23)cc1,"broken aromatic drawing, no unique correct match (0 found)",unfixed
