@@ -13,22 +13,25 @@ PYTHONPATH=. uv run python scripts/run_split.py     # reads cof_matched/data_sub
 Outputs in `substrate_split/output/`:
 - `substrate_split.csv`: one row per substrate: `end_types`, `n_ends`, `main_chain_smiles`,
   `side_chain_smiles` (joined by `.`, `*` = attachment point), atom counts, `flags`.
-- `review.html`: every substrate drawn with end groups (green), main chain (blue), side chains (red).
+- `review.html`: every substrate drawn with end groups (green), main chain (blue), side chains (orange).
   Has filters for "CTF only" and "flagged only".
+- `substrate_split.xlsx`: workbook for the chemists: substrate, main chain and side chains as SMILES and drawings.
 
 ## How the split works (`modules/features/substrate_split.py`)
-1. **End groups.** Tier 1: nitrile, aldehyde, primary amine, boronic acid, terminal alkyne, SnMe3.
-   Tier 2 (halides, phenol OH) is added only if tier 1 finds < 2 ends. Halides are also added when a
-   cross-coupling group (boronic acid / alkyne / stannane) is present.
+The module docstring has the full rules. In short:
+1. **End groups.** Tier 1 linkage groups (nitrile, aldehyde, primary amine, boronic acid, terminal alkyne,
+   SnMe3, COOH, imide N–H, …). Tier 2 (halides, phenol OH) is added only if tier 1 finds < 2 ends. Halides are
+   also added when a cross-coupling group (boronic acid / alkyne / stannane) is present.
 2. **Main chain** = shortest paths between every pair of ends, then every ring sharing ≥ 2 atoms with it
-   (repeated, so fused systems stay whole), then terminal `=O`/`=S` atoms on it.
+   (repeated, so fused systems stay whole). Non-reacting `=O`/`=S`/OH stay side chains.
 3. **Side chains** = whatever is left, as connected pieces.
+
+Hand-checked substrates the rules get wrong are overridden in `modules/features/manual_ends.py`.
 
 ## Status / known issues
 - The 29 CTF (nitrile) substrates all split without flags and look correct by eye.
 - 47 imine substrates are amine + aldehyde monomers already joined by `N=C`. Both end types are used, and the main chain runs through the imine.
-- `large_side_chain` (16 substrates): the side chain is more than half the size of the main chain. These usually mean an end
-  group wasn't recognised (COOH, imide N–H, o-diamine, active CH2, …). Needs a chemist's check.
-- `no_ends_fallback_diameter` (3 substrates): no reactive group found, so the graph's longest path is used.
-- Open questions for the chemists: should ring `C=O` count as main chain (currently yes)? Is OH on an aldehyde
-  ring a side chain (currently yes)?
+- `large_side_chain`: the side chain is more than half the size of the main chain, which usually means an end group
+  wasn't recognised. No substrate has this flag at the moment.
+- `no_ends_fallback_diameter` (2 substrates): no reactive group found, so the graph's longest path is used.
+- `manual_ends` (5 substrates): split set by hand in `manual_ends.py`.
