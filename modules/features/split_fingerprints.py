@@ -166,7 +166,8 @@ def part_descriptor(flatness: bool = False, symmetry: bool = False) -> object:
 
 def capped_fragment_smiles(smiles: str, part: str) -> str:
     """
-    Get one part of the split as a molecule of its own: every cut point (*) becomes a hydrogen.
+    Get one part of the split as a molecule of its own: every cut point (*) is removed and the
+    free valences are filled with hydrogens, also for cut double bonds (e.g. a ring C=O in the side chains).
     :param smiles: SMILES string of the substrate.
     :param part: 'main' or 'side'.
     :return: SMILES of the part (side chains joined by '.', empty if there are none).
@@ -176,10 +177,16 @@ def capped_fragment_smiles(smiles: str, part: str) -> str:
     if not fragment:
         return ""
     mol = Chem.MolFromSmiles(fragment)
-    for atom in mol.GetAtoms():
-        if atom.GetAtomicNum() == 0:
-            atom.SetAtomicNum(1)
-    return Chem.MolToSmiles(Chem.RemoveHs(mol))
+    # in the Kekule form a removed cut point leaves plain free valences instead of a broken aromatic ring
+    Chem.Kekulize(mol, clearAromaticFlags=True)
+    mol = Chem.RWMol(mol)
+    cut_points = [atom for atom in mol.GetAtoms() if atom.GetAtomicNum() == 0]
+    for atom in sorted(cut_points, key=lambda a: a.GetIdx(), reverse=True):
+        for neighbor in atom.GetNeighbors():
+            neighbor.SetNoImplicit(False)
+        mol.RemoveAtom(atom.GetIdx())
+    Chem.SanitizeMol(mol)
+    return Chem.MolToSmiles(mol)
 
 
 class SplitFeatures:
