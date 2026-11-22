@@ -1,0 +1,4 @@
+results/
+data/*.xlsx
+# the repo ignores *.csv; keep the cleaned dataset and its change log
+!data/*.csv
