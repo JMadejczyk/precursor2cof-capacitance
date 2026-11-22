@@ -15,7 +15,9 @@ Algorithm:
    used first. Tier-2 groups (halides, phenol OH) are added only when
    tier 1 gives fewer than 2 ends, because Br/F/OH are usually substituents. Exceptions:
    phenol OH counts in benzoxazine monomers, aryl Br counts when all amines sit on one
-   ring, and manual_ends.py overrides the choice for hand-checked substrates.
+   ring, and manual_ends.py overrides the choice for hand-checked substrates. A manual
+   entry can also name extra anchors: atoms the main chain must reach although no end
+   group marks them.
 2. Main chain = union of shortest graph paths between every pair of end anchors,
    plus the end-group atoms themselves.
 3. Ring expansion: every ring that shares >= 2 atoms with the main chain is added
@@ -117,11 +119,23 @@ def _add_ends(
     return ends + [(name, m) for m in matches if m not in seen]
 
 
+def _manual_entry(mol: Chem.Mol) -> dict | None:
+    return _MANUAL.get(Chem.MolToSmiles(mol))
+
+
+def _manual_atoms(mol: Chem.Mol, entry: dict, key: str) -> list[int]:
+    """Atom indices of `mol` for the entry's `key` (indices given in the entry's SMILES order)."""
+    match = mol.GetSubstructMatch(Chem.MolFromSmiles(entry["smiles"]))
+    return [match[i] for i in entry.get(key, ())]
+
+
 def _keep_manual_ends(
     mol: Chem.Mol, ends: list[tuple[str, tuple[int, ...]]], entry: dict
 ) -> list[tuple[str, tuple[int, ...]]]:
-    match = mol.GetSubstructMatch(Chem.MolFromSmiles(entry["smiles"]))
-    anchors = {match[i] for i in entry["anchors"]}
+    """Ends listed in the entry's "anchors"; every end if the entry has no "anchors"."""
+    if "anchors" not in entry:
+        return ends
+    anchors = set(_manual_atoms(mol, entry, "anchors"))
     return [e for e in ends if e[1][0] in anchors]
 
 
@@ -167,11 +181,16 @@ def find_end_groups(
         ends = _add_ends(
             ends, "bromide", mol.GetSubstructMatches(_PATTERNS["bromide"])
         )
-    entry = _MANUAL.get(Chem.MolToSmiles(mol))
+    entry = _manual_entry(mol)
     if entry:
         ends = _keep_manual_ends(mol, ends, entry)
+        if not ends:
+            flags = []
         flags.append("manual_ends")
-    if len(ends) < 2:
+        # Extra anchors count towards the two points a chain needs.
+        if len(ends) + len(entry.get("extra_anchors", ())) < 2:
+            raise ValueError(f"Manual entry leaves fewer than 2 anchors: {entry['smiles']}")
+    elif len(ends) < 2:
         return [], ["no_ends_fallback_diameter"]
     if len({name for name, _ in ends}) > 1:
         flags.append("mixed_end_types")
@@ -272,8 +291,10 @@ def split_substrate(smiles: str, keep_exocyclic_double_bonds: bool = False) -> S
 
     ends, flags = find_end_groups(mol)
     end_atoms = {a for _, m in ends for a in m}
-    if ends:
-        anchors = [m[0] for _, m in ends]
+    entry = _manual_entry(mol)
+    extra_anchors = _manual_atoms(mol, entry, "extra_anchors") if entry else []
+    if ends or extra_anchors:
+        anchors = [m[0] for _, m in ends] + extra_anchors
     else:
         anchors = _fallback_anchors(mol)
 
