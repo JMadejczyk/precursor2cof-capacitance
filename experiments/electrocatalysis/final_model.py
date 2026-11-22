@@ -135,7 +135,8 @@ if __name__ == "__main__":
         part, bit = match.group(1) or "full", int(match.group(2))
         if envs[part] is None:
             envs[part] = ecfp_environments(smiles_used, part)
-        top = envs[part].get(bit, Counter()).most_common(3)
+        # most frequent first, ties alphabetical so the file is identical across runs
+        top = sorted(envs[part].get(bit, Counter()).items(), key=lambda kv: (-kv[1], kv[0]))[:3]
         bit_rows.append({"feature": feature, "part": part, "bit": bit, "substructures": " | ".join(f"{s} ({n})" for s, n in top)})
     if bit_rows:
         pd.DataFrame(bit_rows).to_csv(os.path.join(out_dir, "ecfp_bits.csv"), index=False)
