@@ -1,0 +1,48 @@
+# Same experiment, trained on all COFs (non-CTFs always in train), evaluated on the same CTF test folds.
+# Paths are relative to the repo root (run scripts from there).
+source_path: 'substrate_split/output/substrate_split.csv'
+work_dir: 'experiments/ctf_substrate_split/results_all_cofs'
+# 'ctf': train and test on the 29 CTFs; 'all': test on CTFs, train also on all non-CTF COFs
+train_scope: 'all'
+
+remove_threshold: 0.99
+
+# Every representation is applied identically to full / main / side SMILES.
+representations:
+  ecfp_2_1024_count:
+    type: ecfp
+    params: {radius: 2, size: 1024, count: True}
+  maccs_count:
+    type: maccs
+    params: {count: True}
+
+# 1: F(full); 2: F(main) || F(side); 3: F(full) || F(main) || F(side)
+approaches:
+  a1_full: [full]
+  a2_main_side: [main, side]
+  a3_all: [full, main, side]
+
+cv:
+  num_folds: 5
+  num_repeats: 10
+  num_bins: 5
+  random_state: 42
+
+models: ['bayes', 'lasso', 'random_forest', 'xgboost', 'knn', 'tabpfn']
+hyperparam_opt: False
+
+# SHAP is skipped for models not listed here (TabPFN SHAP is too slow on CPU).
+shap_models: ['bayes', 'lasso', 'random_forest', 'xgboost']  # KNN Kernel SHAP is ~5x slower with 114 training rows
+
+tabpfn:
+  device: 'cpu'  # 'cuda' on the 3090, 'mps' may work on Apple silicon
+
+metrics: [
+  'pairwise_accuracy_score',
+  'ndcg_score',
+  'rmse',
+  'mae',
+  'mape',
+  'smape',
+  'r2_score'
+]
